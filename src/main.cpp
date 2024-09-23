@@ -108,9 +108,9 @@ void setup()
 
   // motor_standby(false);
 
-  motor_speed2(motor_A, -100);
-  delay(2000);
-  motor_speed2(motor_A, 0);
+  // motor_speed2(motor_A, -100);
+  // delay(2000);
+  // motor_speed2(motor_A, 0);
 
   // motor_speed2(motor_A, -100);
   // motor_speed2(motor_B, -100);
@@ -126,7 +126,12 @@ void setup()
 }
 
 void loop()
+
 {
+   motor_speed2(motor_A, -100);
+  delay(2000);
+  motor_speed2(motor_A, 0);
+  delay(2000);
 }
 
 void motor_speed2(boolean motor, char speed)
