@@ -20,12 +20,12 @@
 void motor_speed2(boolean motor, char speed);
 void motor_speed(boolean motor, boolean direction, byte speed);
 void motor_brake(boolean motor);
-void ISR_CountTicksM1();
+void ISR_CountTicks();
 
-volatile long ticksM1 = 0; // Make signed to handle decrementing
-float angleM1 = 0.0;
-
-#define encCPR 12 * 29.86
+volatile long ticks = 0; // Make signed to handle decrementing
+float angle = 0.0;
+float targetAngle = 90;
+const float encCPR = 12 * 29.86;
 
 void setup()
 {
@@ -40,44 +40,52 @@ void setup()
   pinMode(out_B_IN1, OUTPUT);
   pinMode(out_B_IN2, OUTPUT);
 
-  attachInterrupt(digitalPinToInterrupt(M1_OUT_A), ISR_CountTicksM1, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(M2_OUT_A), ISR_CountTicks, CHANGE);
 
-  motor_speed(motor_A, 0, 100);
-  motor_speed(motor_B, 0, 100);
+  // motor_speed(motor_B, 0, 100);
 
-  delay(500);
+  // delay(500);
 
-  motor_brake(motor_A);
-  motor_brake(motor_B);
-  delay(2000);
+  // motor_brake(motor_A);
+  // // motor_brake(motor_B);
+  // delay(2000);
 }
 
 void loop()
 {
+  motor_speed(motor_B, 0, 100);
 }
 
-void ISR_CountTicksM1()
+void ISR_CountTicks()
 {
-  bool currentStateA = digitalRead(M1_OUT_A); // Read current state of OUT A
-  bool currentStateB = digitalRead(M1_OUT_B); // Read current state of OUT B
+  bool currentStateA = digitalRead(M2_OUT_A); // Read current state of OUT A
+  bool currentStateB = digitalRead(M2_OUT_B); // Read current state of OUT B
 
   // Determine direction of rotation based on A and B
   if (currentStateA == currentStateB)
   {
-    ticksM1--; // Counterclockwise: Decrement ticks
+    ticks--; // Counterclockwise: Decrement ticks
   }
   else
   {
-    ticksM1++; // Clockwise: Increment ticks
+    ticks++; // Clockwise: Increment ticks
   }
 
-  angleM1 = fmod((ticksM1 / encCPR) * (360 / (2 * PI)), 360); // Angle = (ticks * 360) / CPR
+  angle = (ticks / encCPR) * 360.0;
 
   // Display ticks and angle
-  Serial.print("TicksM1: ");
-  Serial.print(ticksM1);
-  Serial.print("\tAngleM1 (deg): ");
-  Serial.println(angleM1);
+  Serial.print("Ticks: ");
+  Serial.print(ticks);
+  Serial.print("\tAngle (deg): ");
+  Serial.println(angle);
+
+  if (angle >= targetAngle)
+  {
+    motor_brake(motor_B); // Stop the motor when the target angle is reached
+    ticks = 0;
+    Serial.println("Target angle reached!");
+    delay(2000);
+  }
 }
 
 void motor_speed(boolean motor, boolean direction, byte speed)
