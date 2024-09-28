@@ -5,12 +5,14 @@
 // Define encoder objects for 4 motors
 Encoder motor1Encoder(A0);
 Encoder motor2Encoder(A1);
-Encoder motor3Encoder(A2); // Example pins for additional encoders
+Encoder motor3Encoder(A2);
 Encoder motor4Encoder(A3);
 
 // Define Motor objects for 4 motors
-Motor motor1(0, 2, 1);    // Motor 1: PWM, IN1, IN2 pins
-Motor motor2(7, 6, 5);    // Motor 2: PWM, IN1, IN2 pins
+Motor motor1(0, 2, 1); // Motor 1: PWM, IN1, IN2 pins
+Motor motor2(7, 6, 5); // Motor 2: PWM, IN1, IN2 pins
+
+// CHECK THIS PLEASE THESE ARE DEFAULT VALUES LMAOOO
 Motor motor3(10, 12, 11); // Motor 3: PWM, IN1, IN2 pins
 Motor motor4(14, 16, 15); // Motor 4: PWM, IN1, IN2 pins
 
