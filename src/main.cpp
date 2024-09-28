@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include "motor.h"
 #include "encoders.h"
+#include "bno.h"
+#include "screen.h"
+
+BNO myBNO;
+Screen myScreen;
 
 // Define encoder objects for 4 motors
 Encoder motor1Encoder(A0);
@@ -39,6 +44,14 @@ void setup()
   motor2.init();
   motor3.init();
   motor4.init();
+
+  myScreen.init();
+
+  if (!myBNO.init())
+  {
+    while (1)
+      ; // Initialization failed, halt here
+  }
 }
 
 // Move function with delta angle and motor selection
