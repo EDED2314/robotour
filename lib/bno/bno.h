@@ -12,8 +12,7 @@ public:
     // Constructor
     BNO(uint8_t address = 0x28);
 
-    // Initialize the sensor
-    bool init();
+    bool init(boolean cal);
 
     // Calibrate the sensor
     void calibrate();
@@ -27,6 +26,9 @@ public:
 private:
     Adafruit_BNO055 bno;
     float heading; // Holds the calculated heading
+    void displayCalStatus();
+    void restoreCalibration();
+    void storeCalibrationData(const adafruit_bno055_offsets_t &calibData);
 };
 
 #endif // BNO_H
