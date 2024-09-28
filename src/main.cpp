@@ -1,154 +1,113 @@
 #include <Arduino.h>
-// // Configure these to fit your design...
-// // #define out_STBY 5
+#include "encoders.h"
+
+// Define motor control pins
 #define out_M1_PWM 0
 #define out_M1_IN2 1
 #define out_M1_IN1 2
-#define M1_OUT_A 3
-#define M1_OUT_B 4
-
+#define out_M2_PWM 7
 #define out_M2_IN1 6
 #define out_M2_IN2 5
-#define out_M2_PWM 7
-#define M2_OUT_A 8
-#define M2_OUT_B 9
 
-// #define motor_A 0
-// #define motor_B 1
-// #define motor_AB 2
+// Define encoder objects
+Encoder motor1Encoder(A0); // Assuming the first AS5600 is connected to A0
+Encoder motor2Encoder(A1); // Assuming the second AS5600 is connected to A1
 
-// void motor_speed2(boolean motor, char speed);
-// void motor_speed(boolean motor, boolean direction, byte speed);
-// void motor_brake(boolean motor);
-// void ISR_CountTicks();
-
-// volatile long ticks = 0; // Make signed to handle decrementing
-// float angle = 0.0;
-// float targetAngle = 180;
-// const float encCPR = 12 * 29.86;
-
-// void setup()
-// {
-//   Serial.begin(9600);
-//   while (!Serial)
-//     ;
-//   //  pinMode(out_STBY, OUTPUT);
-//   pinMode(out_A_PWM, OUTPUT);
-//   pinMode(out_A_IN1, OUTPUT);
-//   pinMode(out_A_IN2, OUTPUT);
-//   pinMode(out_B_PWM, OUTPUT);
-//   pinMode(out_B_IN1, OUTPUT);
-//   pinMode(out_B_IN2, OUTPUT);
-
-//   attachInterrupt(digitalPinToInterrupt(M1_OUT_A), ISR_CountTicks, CHANGE);
-//   attachInterrupt(digitalPinToInterrupt(M1_OUT_B), ISR_CountTicks, CHANGE);
-
-//   // motor_speed(motor_B, 0, 100);
-
-//   // delay(500);
-
-//   // motor_brake(motor_A);
-//   // // motor_brake(motor_B);
-//   // delay(2000);
-// }
-
-// void loop()
-// {
-//   motor_speed(motor_A, 0, 50);
-// }
-
-// void ISR_CountTicks()
-// {
-//   // bool currentStateA = digitalRead(M2_OUT_A); // Read current state of OUT A
-//   // bool currentStateB = digitalRead(M2_OUT_B); // Read current state of OUT B
-//   ticks++;
-//   // Determine direction of rotation based on A and B
-//   // if (currentStateA == currentStateB)
-//   // {
-//   //   ticks--; // Counterclockwise: Decrement ticks
-//   // }
-//   // else
-//   // {
-//   //   ticks++; // Clockwise: Increment ticks
-//   // }
-
-//   angle = (ticks / encCPR) * 360.0;
-
-//   // Display ticks and angle
-//   Serial.print("Ticks: ");
-//   Serial.print(ticks);
-//   Serial.print("\tAngle (deg): ");
-//   Serial.println(angle);
-
-//   if (angle >= targetAngle)
-//   {
-//     motor_brake(motor_A); // Stop the motor when the target angle is reached
-//     ticks = 0;
-//     Serial.println("Target angle reached!");
-//     delay(2000);
-//   }
-// }
-
-// void motor_speed(boolean motor, boolean direction, byte speed)
-// { // speed from 0 to 255, direction: 0/false is forward, 1/true
-//   if (motor == motor_A)
-//   {
-//     if (direction == 0)
-//     {
-//       digitalWrite(out_A_IN1, HIGH);
-//       digitalWrite(out_A_IN2, LOW);
-//     }
-//     else
-//     {
-//       digitalWrite(out_A_IN1, LOW);
-//       digitalWrite(out_A_IN2, HIGH);
-//     }
-//     analogWrite(out_A_PWM, speed);
-//   }
-//   else
-//   {
-//     if (direction == 0)
-//     {
-//       digitalWrite(out_B_IN1, HIGH);
-//       digitalWrite(out_B_IN2, LOW);
-//     }
-//     else
-//     {
-//       digitalWrite(out_B_IN1, LOW);
-//       digitalWrite(out_B_IN2, HIGH);
-//     }
-//     analogWrite(out_B_PWM, speed);
-//   }
-// }
-
-// void motor_brake(boolean motor)
-// {
-//   if (motor == motor_A)
-//   {
-//     digitalWrite(out_A_IN1, HIGH);
-//     digitalWrite(out_A_IN2, HIGH);
-//   }
-//   else
-//   {
-//     digitalWrite(out_B_IN1, HIGH);
-//     digitalWrite(out_B_IN2, HIGH);
-//   }
-// }
-
-#include "encoders.h"
-
-Encoder myEncoder(A0); // Assuming the encoder is connected to pin A0
+// PID control variables
+float kp = 1.0, ki = 0.1, kd = 0.01;
+float prevErrorMotor1 = 0, integralMotor1 = 0;
+float prevErrorMotor2 = 0, integralMotor2 = 0;
 
 void setup()
 {
   Serial.begin(9600);
-  myEncoder.begin();
+
+  // Initialize the encoders
+  motor1Encoder.begin();
+  motor2Encoder.begin();
+
+  // Initialize motor control pins
+  pinMode(out_M1_PWM, OUTPUT);
+  pinMode(out_M1_IN1, OUTPUT);
+  pinMode(out_M1_IN2, OUTPUT);
+
+  pinMode(out_M2_PWM, OUTPUT);
+  pinMode(out_M2_IN1, OUTPUT);
+  pinMode(out_M2_IN2, OUTPUT);
+}
+
+// Move function to control motor position based on target angle
+void move(float targetAngleMotor1, float targetAngleMotor2)
+{
+  // Read the current angles from the encoders
+  float currentAngleMotor1 = motor1Encoder.getAngle();
+  float currentAngleMotor2 = motor2Encoder.getAngle();
+
+  // Calculate PID for Motor 1
+  float errorMotor1 = targetAngleMotor1 - currentAngleMotor1;
+  integralMotor1 += errorMotor1;
+  float derivativeMotor1 = errorMotor1 - prevErrorMotor1;
+  float motor1Speed = kp * errorMotor1 + ki * integralMotor1 + kd * derivativeMotor1;
+  prevErrorMotor1 = errorMotor1;
+
+  // Calculate PID for Motor 2
+  float errorMotor2 = targetAngleMotor2 - currentAngleMotor2;
+  integralMotor2 += errorMotor2;
+  float derivativeMotor2 = errorMotor2 - prevErrorMotor2;
+  float motor2Speed = kp * errorMotor2 + ki * integralMotor2 + kd * derivativeMotor2;
+  prevErrorMotor2 = errorMotor2;
+
+  // Control Motor 1 based on PID output
+  setMotorSpeed(1, motor1Speed);
+
+  // Control Motor 2 based on PID output
+  setMotorSpeed(2, motor2Speed);
+}
+
+// Function to set motor speed and direction
+void setMotorSpeed(int motor, float speed)
+{
+  if (motor == 1)
+  {
+    if (speed > 0)
+    {
+      // Move forward
+      digitalWrite(out_M1_IN1, HIGH);
+      digitalWrite(out_M1_IN2, LOW);
+    }
+    else
+    {
+      // Move backward
+      digitalWrite(out_M1_IN1, LOW);
+      digitalWrite(out_M1_IN2, HIGH);
+      speed = -speed;
+    }
+    analogWrite(out_M1_PWM, constrain(speed, 0, 255)); // Limit PWM to 0-255
+  }
+  if (motor == 2)
+  {
+    if (speed > 0)
+    {
+      // Move forward
+      digitalWrite(out_M2_IN1, HIGH);
+      digitalWrite(out_M2_IN2, LOW);
+    }
+    else
+    {
+      // Move backward
+      digitalWrite(out_M2_IN1, LOW);
+      digitalWrite(out_M2_IN2, HIGH);
+      speed = -speed;
+    }
+    analogWrite(out_M2_PWM, constrain(speed, 0, 255)); // Limit PWM to 0-255
+  }
 }
 
 void loop()
 {
-  float angle = myEncoder.getAngle(); // Read the current angle
-  Serial.print("Current Angle: ");
-  Serial.println(angle); // Print the angle to the serial monitor
-  delay(500);            // Wait for half a second before the next reading
+  // Example move calls:
+  // Move motor 1 to 90 degrees and motor 2 to 180 degrees
+  move(90.0, 180.0);
+
+  delay(500); // Optional delay to slow the loop down
 }
