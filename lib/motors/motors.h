@@ -1,4 +1,0 @@
-#ifndef MOTORCONTROLLER
-#define MOTORCONTROLLER
-
-#endif

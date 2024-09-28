@@ -1,22 +1,6 @@
 #include <Arduino.h>
+#include "motor.h"
 #include "encoders.h"
-
-// Define motor control pins for 4 motors
-#define out_M1_PWM 0
-#define out_M1_IN2 1
-#define out_M1_IN1 2
-
-#define out_M2_PWM 7
-#define out_M2_IN1 6
-#define out_M2_IN2 5
-
-#define out_M3_PWM 10 // Example pins for motor 3
-#define out_M3_IN1 11
-#define out_M3_IN2 12
-
-#define out_M4_PWM 14 // Example pins for motor 4
-#define out_M4_IN1 15
-#define out_M4_IN2 16
 
 // Define encoder objects for 4 motors
 Encoder motor1Encoder(A0);
@@ -24,10 +8,19 @@ Encoder motor2Encoder(A1);
 Encoder motor3Encoder(A2); // Example pins for additional encoders
 Encoder motor4Encoder(A3);
 
-// PID control variables (same for all motors for now, but can be tuned individually)
+// Define Motor objects for 4 motors
+Motor motor1(0, 2, 1);    // Motor 1: PWM, IN1, IN2 pins
+Motor motor2(7, 6, 5);    // Motor 2: PWM, IN1, IN2 pins
+Motor motor3(10, 12, 11); // Motor 3: PWM, IN1, IN2 pins
+Motor motor4(14, 16, 15); // Motor 4: PWM, IN1, IN2 pins
+
+// PID control variables
 float kp = 1.0, ki = 0.1, kd = 0.01;
 float prevError[4] = {0, 0, 0, 0}; // Previous error for each motor
 float integral[4] = {0, 0, 0, 0};  // Integral term for each motor
+
+// Tracking total cumulative angles for each motor
+float cumulativeAngle[4] = {0, 0, 0, 0}; // Cumulative angle for each motor
 
 void setup()
 {
@@ -39,31 +32,18 @@ void setup()
   motor3Encoder.begin();
   motor4Encoder.begin();
 
-  // Initialize motor control pins for all motors
-  pinMode(out_M1_PWM, OUTPUT);
-  pinMode(out_M1_IN1, OUTPUT);
-  pinMode(out_M1_IN2, OUTPUT);
-
-  pinMode(out_M2_PWM, OUTPUT);
-  pinMode(out_M2_IN1, OUTPUT);
-  pinMode(out_M2_IN2, OUTPUT);
-
-  pinMode(out_M3_PWM, OUTPUT);
-  pinMode(out_M3_IN1, OUTPUT);
-  pinMode(out_M3_IN2, OUTPUT);
-
-  pinMode(out_M4_PWM, OUTPUT);
-  pinMode(out_M4_IN1, OUTPUT);
-  pinMode(out_M4_IN2, OUTPUT);
+  // Initialize motor objects
+  motor1.init();
+  motor2.init();
+  motor3.init();
+  motor4.init();
 }
 
 // Move function with delta angle and motor selection
 void move(float DELTAangle, int motorSelector)
 {
-  // Variables for the target angle and current angle of the selected motor
-  float currentAngle = 0;
-  float targetAngle = 0;
   int motorIndex = motorSelector - 1; // Motor selector: 1-4, corresponding to array index 0-3
+  float currentAngle = 0;
 
   // Select the appropriate encoder and read the current angle
   switch (motorSelector)
@@ -85,74 +65,58 @@ void move(float DELTAangle, int motorSelector)
     return;
   }
 
-  // Calculate the target angle
-  targetAngle = currentAngle + DELTAangle;
+  // Calculate the difference between the current reading and the last cumulative angle
+  float previousCumulativeAngle = cumulativeAngle[motorIndex];
+  float angleDifference = currentAngle - fmod(previousCumulativeAngle, 360);
+
+  // Handle angle wrapping (0-360) range
+  if (angleDifference > 180)
+  {
+    // Encoder wrapped from 360 to 0
+    angleDifference -= 360;
+  }
+  else if (angleDifference < -180)
+  {
+    // Encoder wrapped from 0 to 360
+    angleDifference += 360;
+  }
+
+  // Update cumulative angle by adding the corrected angle difference
+  cumulativeAngle[motorIndex] += angleDifference;
+
+  // Calculate the target angle after the delta movement
+  float targetAngle = cumulativeAngle[motorIndex] + DELTAangle;
 
   // Calculate PID control variables for the selected motor
-  float error = targetAngle - currentAngle;
+  float error = targetAngle - cumulativeAngle[motorIndex];
   integral[motorIndex] += error;
   float derivative = error - prevError[motorIndex];
   float motorSpeed = kp * error + ki * integral[motorIndex] + kd * derivative;
   prevError[motorIndex] = error;
 
-  // Apply motor speed and direction
-  setMotorSpeed(motorSelector, motorSpeed);
-}
-
-// Function to set motor speed and direction for the selected motor
-void setMotorSpeed(int motor, float speed)
-{
-  int pwmPin = 0, in1Pin = 0, in2Pin = 0;
-
-  // Set pins based on the motor selector
-  switch (motor)
+  // Apply motor speed and direction using the Motor class
+  switch (motorSelector)
   {
   case 1:
-    pwmPin = out_M1_PWM;
-    in1Pin = out_M1_IN1;
-    in2Pin = out_M1_IN2;
+    motor1.setSpeed(motorSpeed);
     break;
   case 2:
-    pwmPin = out_M2_PWM;
-    in1Pin = out_M2_IN1;
-    in2Pin = out_M2_IN2;
+    motor2.setSpeed(motorSpeed);
     break;
   case 3:
-    pwmPin = out_M3_PWM;
-    in1Pin = out_M3_IN1;
-    in2Pin = out_M3_IN2;
+    motor3.setSpeed(motorSpeed);
     break;
   case 4:
-    pwmPin = out_M4_PWM;
-    in1Pin = out_M4_IN1;
-    in2Pin = out_M4_IN2;
+    motor4.setSpeed(motorSpeed);
     break;
-  default:
-    Serial.println("Invalid motor selector");
-    return;
   }
-
-  // Control motor direction based on speed sign
-  if (speed > 0)
-  {
-    digitalWrite(in1Pin, HIGH);
-    digitalWrite(in2Pin, LOW);
-  }
-  else
-  {
-    digitalWrite(in1Pin, LOW);
-    digitalWrite(in2Pin, HIGH);
-    speed = -speed;
-  }
-
-  // Apply PWM speed control (constrain to valid range)
-  analogWrite(pwmPin, constrain(speed, 0, 255));
 }
 
 void loop()
 {
   // Example move commands:
   move(45.0, 1);  // Move motor 1 by 45 degrees
-  move(-30.0, 2); // Move motor 2 by -30 degrees
+  move(400.0, 2); // Move motor 2 by 400 degrees (should handle angle wrapping)
 
-  delay(1000);
+  delay(1000); // Delay for stability between moves
+}
