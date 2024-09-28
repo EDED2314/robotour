@@ -2,10 +2,10 @@
 #include "motor.h"
 #include "encoders.h"
 #include "bno.h"
-#include "screen.h"
+// #include "screen.h"
 
 BNO myBNO;
-Screen myScreen;
+// Screen myScreen;
 
 // Define encoder objects for 4 motors
 Encoder motor1Encoder(A0);
@@ -45,9 +45,9 @@ void setup()
   motor3.init();
   motor4.init();
 
-  myScreen.init();
+  // myScreen.init();
 
-  if (!myBNO.init())
+  if (!myBNO.init(false))
   {
     while (1)
       ; // Initialization failed, halt here
@@ -130,8 +130,8 @@ void move(float DELTAangle, int motorSelector)
 void loop()
 {
   // Example move commands:
-  move(45.0, 1);  // Move motor 1 by 45 degrees
-  move(400.0, 2); // Move motor 2 by 400 degrees (should handle angle wrapping)
+  // move(45.0, 1);  // Move motor 1 by 45 degrees
+  // move(400.0, 2); // Move motor 2 by 400 degrees (should handle angle wrapping)
 
-  delay(1000); // Delay for stability between moves
+  // delay(1000); // Delay for stability between moves
 }
