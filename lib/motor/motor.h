@@ -15,6 +15,8 @@ public:
     // Set motor speed (with direction control)
     void setSpeed(float speed);
 
+    void brake();
+
 private:
     uint8_t _pwmPin; // PWM pin for motor speed
     uint8_t _in1Pin; // IN1 pin for direction

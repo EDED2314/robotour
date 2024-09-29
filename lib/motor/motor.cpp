@@ -1,5 +1,5 @@
 #include "motor.h"
-
+#include "Arduino.h"
 // Constructor to initialize motor pins
 Motor::Motor(uint8_t pwmPin, uint8_t in1Pin, uint8_t in2Pin)
     : _pwmPin(pwmPin), _in1Pin(in1Pin), _in2Pin(in2Pin) {}
@@ -28,4 +28,11 @@ void Motor::setSpeed(float speed)
     }
     // Apply PWM to control speed, constrained to 0-255 range
     analogWrite(_pwmPin, constrain(speed, 0, 255));
+}
+
+void Motor::brake()
+{
+    digitalWrite(_in1Pin, HIGH);
+    digitalWrite(_in2Pin, HIGH);
+    analogWrite(_pwmPin, 0);
 }
