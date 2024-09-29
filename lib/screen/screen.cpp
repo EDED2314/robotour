@@ -2,8 +2,16 @@
 
 // Constructor
 Screen::Screen(uint8_t width, uint8_t height, int8_t reset_pin, uint8_t address)
-    : screenWidth(width), screenHeight(height), resetPin(reset_pin), screenAddress(address),
-      display(Adafruit_SSD1306(width, height, &Wire, reset_pin)) {}
+{
+    // Initialize member variables
+    screenWidth = width;
+    screenHeight = height;
+    resetPin = reset_pin;
+    screenAddress = address;
+
+    // Initialize the display object
+    display = Adafruit_SSD1306(width, height, &Wire, reset_pin);
+}
 
 // Initialize the display
 bool Screen::init()
