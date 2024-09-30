@@ -29,32 +29,6 @@ float integral[4] = {0, 0, 0, 0};  // Integral term for each motor
 // Tracking total cumulative angles for each motor
 float cumulativeAngle[4] = {0, 0, 0, 0}; // Cumulative angle for each motor
 
-void setup()
-{
-  Serial.begin(9600);
-
-  // Initialize encoders
-  // motor1Encoder.begin();
-  motor2Encoder.begin();
-  // motor3Encoder.begin();
-  // motor4Encoder.begin();
-
-  // Initialize motor objects
-  motor1.init();
-  motor2.init();
-  // motor3.init();
-  // motor4.init();
-
-  myScreen.init();
-  myScreen.print("hello");
-
-  // if (!myBNO.init(false))
-  // {
-  //   while (1)
-  //     ; // Initialization failed, halt here
-  // }
-}
-
 // Move function with delta angle and motor selection
 void move(float DELTAangle, int motorSelector)
 {
@@ -69,6 +43,9 @@ void move(float DELTAangle, int motorSelector)
     break;
   case 2:
     currentAngle = motor2Encoder.getAngle();
+    myScreen.clear();
+    myScreen.display.setCursor(0, 0);
+    myScreen.println(String(currentAngle));
     break;
   case 3:
     //  currentAngle = motor3Encoder.getAngle();
@@ -128,6 +105,44 @@ void move(float DELTAangle, int motorSelector)
   }
 }
 
+void setup()
+{
+  Serial.begin(9600);
+
+  // Initialize encoders
+  // motor1Encoder.begin();
+  motor2Encoder.begin();
+  // motor3Encoder.begin();
+  // motor4Encoder.begin();
+
+  // Initialize motor objects
+  motor1.init();
+  motor2.init();
+  // motor3.init();
+  // motor4.init();
+
+  myScreen.init();
+  myScreen.print("hello");
+
+  // if (!myBNO.init(false))
+  // {
+  //   while (1)
+  //     ; // Initialization failed, halt here
+  // }
+
+  // move(90.0, 2); // Move motor 2 by 400 degrees (should handle angle wrapping)
+  float currentAngle = motor2Encoder.getAngle();
+  while (currentAngle <= 90)
+  {
+    currentAngle = motor2Encoder.getAngle();
+    myScreen.clear();
+    myScreen.display.setCursor(0, 0);
+    myScreen.println(String(currentAngle));
+    motor2.setSpeed(100);
+  }
+  motor2.brake();
+}
+
 void loop()
 {
 
@@ -139,13 +154,6 @@ void loop()
   // delay(2000);
   // Example move commands:
   // move(45.0, 1);  // Move motor 1 by 45 degrees
-  // move(90.0, 2); // Move motor 2 by 400 degrees (should handle angle wrapping)
-  int rawValue = analogRead(A0);         // Read the raw analog value (0-1023)
-  float angle = rawValue * 360.0 / 1023; // Convert to degrees
-  myScreen.clear();
-  myScreen.display.setCursor(0, 0);
-  myScreen.println(String(angle));
-  myScreen.println(String(rawValue));
 
   // delay(2000); // Delay for stability between moves
 }
