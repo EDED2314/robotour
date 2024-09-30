@@ -16,8 +16,8 @@ public:
     float getAngle();
 
 private:
-    uint8_t _analogPin;                    // Pin for reading the encoder output
-    const float _scaleFactor = 0.00916667; // Scaling from 10-bit ADC to 360 degrees
+    uint8_t _analogPin;                      // Pin for reading the encoder output
+    const float _scaleFactor = 360.0 / 1023; // Scaling from 10-bit ADC to 360 degrees
 };
 
 #endif
