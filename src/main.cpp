@@ -22,9 +22,9 @@ Motor motor2(7, 5, 6); // Motor 2: PWM, IN1, IN2 pins
 // Motor motor3(10, 12, 11); // Motor 3: PWM, IN1, IN2 pins
 // Motor motor4(14, 16, 15); // Motor 4: PWM, IN1, IN2 pins
 const int stepsPerRev = 200;
-// Stepper myStepper(stepsPerRev, 8, 9, 10, 11);
-Stepper myStepper(stepsPerRev, 11, 10, 9, 8);
-// PID control variables
+Stepper myStepper(stepsPerRev, 8, 9, 10, 11);
+// Stepper myStepper(stepsPerRev, 11, 10, 9, 8);
+//  PID control variables
 float kp = 1.0, ki = 0.1, kd = 0.01;
 float prevError[4] = {0, 0, 0, 0}; // Previous error for each motor
 float integral[4] = {0, 0, 0, 0};  // Integral term for each motor
@@ -133,8 +133,11 @@ void setup()
   //   while (1)
   //     ; // Initialization failed, halt here
   // }
-
-  // move(90.0, 2); // Move motor 2 by 400 degrees (should handle angle wrapping)
+  myStepper.setSpeed(10);
+  // myStepper.stepMotor(0);
+  // myStepper.stepMotor(1);
+  // myStepper.stepMotor(2);
+  // myStepper.stepMotor(3);
 }
 
 void loop()
@@ -158,5 +161,9 @@ void loop()
   // motor2.brake();
   // prev = currentAngle;
   myStepper.step(100);
+  // myStepper.stepMotor(0);
+  // myStepper.stepMotor(1);
+  // myStepper.stepMotor(2);
+  // myStepper.stepMotor(3);
   delay(1000);
 }
