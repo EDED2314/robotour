@@ -40,9 +40,6 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
     pinMode(this->motor_pin_3, OUTPUT);
     pinMode(this->motor_pin_4, OUTPUT);
 
-    // When there are 4 pins, set the others to 0:
-    this->motor_pin_5 = 0;
-
     // pin_count is used by the stepMotor() method:
     this->pin_count = 4;
 }
@@ -103,10 +100,8 @@ void Stepper::step(int steps_to_move)
             // decrement the steps left:
             steps_left--;
             // step the motor to step number 0, 1, ..., {3 or 10}
-            if (this->pin_count == 5)
-                stepMotor(this->step_number % 10);
-            else
-                stepMotor(this->step_number % 4);
+
+            stepMotor(this->step_number % 4);
         }
         else
         {

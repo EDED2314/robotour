@@ -22,8 +22,8 @@ Motor motor2(7, 5, 6); // Motor 2: PWM, IN1, IN2 pins
 // Motor motor3(10, 12, 11); // Motor 3: PWM, IN1, IN2 pins
 // Motor motor4(14, 16, 15); // Motor 4: PWM, IN1, IN2 pins
 const int stepsPerRev = 200;
-Stepper myStepper(stepsPerRev, 8, 9, 10, 11);
-
+// Stepper myStepper(stepsPerRev, 8, 9, 10, 11);
+Stepper myStepper(stepsPerRev, 11, 10, 9, 8);
 // PID control variables
 float kp = 1.0, ki = 0.1, kd = 0.01;
 float prevError[4] = {0, 0, 0, 0}; // Previous error for each motor
@@ -31,6 +31,7 @@ float integral[4] = {0, 0, 0, 0};  // Integral term for each motor
 
 // Tracking total cumulative angles for each motor
 float cumulativeAngle[4] = {0, 0, 0, 0}; // Cumulative angle for each motor
+float prev = 0;
 
 // Move function with delta angle and motor selection
 void move(float DELTAangle, int motorSelector)
@@ -114,12 +115,12 @@ void setup()
 
   // Initialize encoders
   // motor1Encoder.begin();
-  motor2Encoder.begin();
+  // motor2Encoder.begin();
   // motor3Encoder.begin();
   // motor4Encoder.begin();
 
   // Initialize motor objects
-  // motor1.init();
+  motor1.init();
   // motor2.init();
   // motor3.init();
   // motor4.init();
@@ -136,7 +137,6 @@ void setup()
   // move(90.0, 2); // Move motor 2 by 400 degrees (should handle angle wrapping)
 }
 
-float prev = 0;
 void loop()
 {
 
@@ -151,19 +151,12 @@ void loop()
 
   // delay(2000); // Delay for stability between moves
   // float currentAngle = motor2Encoder.getAngle();
-  // while (abs(currentAngle - prev) <= 180)
-  // {
-  //   currentAngle = motor2Encoder.getAngle();
-  //   myScreen.clear();
-  //   myScreen.display.setCursor(0, 0);
-  //   myScreen.println(String(currentAngle));
-  //   motor2.setSpeed(100);
-  // }
   // myScreen.clear();
   // myScreen.display.setCursor(0, 0);
   // myScreen.println(String(currentAngle));
+
   // motor2.brake();
   // prev = currentAngle;
-
+  myStepper.step(100);
   delay(1000);
 }
