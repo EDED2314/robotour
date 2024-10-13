@@ -143,7 +143,7 @@ void setup()
   //     ; // Initialization failed, halt here
   // }
 
-  myStepper.setSpeed(10);
+  myStepper.setSpeed(30);
 
   // myStepper.stepMotor(0);
   // myStepper.stepMotor(1);
@@ -170,5 +170,5 @@ void loop()
   // myStepper.stepMotor(1);
   // myStepper.stepMotor(2);
   // myStepper.stepMotor(3);
-  // delay(1000);
+  delay(1000);
 }
