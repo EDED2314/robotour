@@ -17,7 +17,7 @@ public:
 
 private:
     uint8_t _analogPin;                      // Pin for reading the encoder output
-    const float _scaleFactor = 360.0 / 1023; // Scaling from 10-bit ADC to 360 degrees
+    const float _scaleFactor = 360.0 / 4095; // Scaling from 12-bit ADC to 360 degrees
 };
 
 #endif

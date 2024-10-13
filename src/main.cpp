@@ -112,6 +112,7 @@ void move(float DELTAangle, int motorSelector)
 void setup()
 {
   Serial.begin(9600);
+  analogReadResolution(12); // Set ADC resolution to 12 bits (0-4095)
 
   // Initialize encoders
   // motor1Encoder.begin();
@@ -161,10 +162,10 @@ void loop()
 
   // motor2.brake();
   // prev = currentAngle;
-  myStepper.step(100);
+  // myStepper.step(100);
   // myStepper.stepMotor(0);
   // myStepper.stepMotor(1);
   // myStepper.stepMotor(2);
   // myStepper.stepMotor(3);
-  delay(1000);
+  // delay(1000);
 }
