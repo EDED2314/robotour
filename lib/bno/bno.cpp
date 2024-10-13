@@ -17,6 +17,10 @@ bool BNO::init(boolean cal)
     {
         calibrate();
     }
+    else
+    {
+        restoreCalibration();
+    }
 
     bno.setExtCrystalUse(true);
     return true;

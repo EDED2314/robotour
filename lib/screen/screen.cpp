@@ -47,6 +47,7 @@ void Screen::println(const String &text)
 void Screen::clear()
 {
     display.clearDisplay();
+    display.setCursor(0, 0);
     display.display(); // Update display after clearing
 }
 
