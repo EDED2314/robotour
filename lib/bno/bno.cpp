@@ -2,7 +2,17 @@
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
 #include <EEPROM.h>
-// Constructor
+#include <SimpleKalmanFilter.h>
+
+/*
+SimpleKalmanFilter(e_mea, e_est, q);
+
+e_mea: Measurement Uncertainty
+e_est: Estimation Uncertainty
+q: Process Noise
+*/
+SimpleKalmanFilter w1kalman(0.03, 1.0, 0.001);
+
 BNO::BNO(uint8_t address) : bno(55, address, &Wire) {}
 
 // Initialize the sensor
@@ -95,31 +105,33 @@ void BNO::displayCalStatus()
     Serial.println(mag);
 }
 
-float BNO::calculateHeading()
+float BNO::getHeading()
 {
-    // Get quaternion values
-    imu::Quaternion quat;
-    quat = bno.getQuat();
 
-    // Rotate the north-pointing vector (1, 0, 0) using the quaternion
-    float v[3] = {1, 0, 0}; // North vector as a quaternion
-    float rotated[3];       // To hold the result
+    imu::Quaternion q = bno.getQuat();
+    imu::Quaternion q_prime = q.conjugate();
+    imu::Quaternion p{0, 0, 1, 0};
+    imu::Quaternion p_prime = q * p * q_prime;
+    heading = acos(p_prime.z()) * 180 / PI;
 
-    // Quaternion rotation: qvq^-1
-    // This is simplified since we can directly use quaternion multiplication
-
-    rotated[0] = (quat.w() * v[0] - quat.x() * v[1] - quat.y() * v[2]);
-    rotated[1] = (quat.x() * v[0] + quat.w() * v[1] + quat.z() * v[2]);
-    rotated[2] = (quat.y() * v[0] - quat.z() * v[1] + quat.w() * v[2]);
-
-    // Calculate heading using atan2(y, x)
-    heading = atan2(rotated[1], rotated[0]) * (180.0 / M_PI); // Convert to degrees
-    if (heading < 0)
+    if (isnan(heading))
     {
-        heading += 360; // Normalize to 0-360 degrees
+        return 0;
     }
 
     return heading;
+}
+
+float BNO::getHeadingGyro()
+{
+    long tnow = millis();
+    long dt = tnow - lastTimeSampled;
+    float wx, wy, wz;
+    getAngularVelocity(wx, wy, wz);
+    float E1 = w1kalman.updateEstimate(wx);
+    heading += E1 * dt * 0.001 * 0.99;
+    lastTimeSampled = tnow;
+    return heading * (180.0 / M_PI);
 }
 
 // Get the angular velocity (wx, wy, wz)

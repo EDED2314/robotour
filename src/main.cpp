@@ -47,4 +47,7 @@ void setup()
 
 void loop()
 {
+  float heading = myBNO.getHeading();
+  myScreen.clear();
+  myScreen.println(heading);
 }
