@@ -13,7 +13,7 @@ public:
     void setSpeed(long whatSpeed);
 
     // mover method:
-    void step(int number_of_steps);
+    void step(int number_of_steps, void (*callback)());
     void stepMotor(int this_step);
 
 private:

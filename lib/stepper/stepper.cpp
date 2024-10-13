@@ -56,7 +56,7 @@ void Stepper::setSpeed(long whatSpeed)
  * Moves the motor steps_to_move steps.  If the number is negative,
  * the motor moves in the reverse direction.
  */
-void Stepper::step(int steps_to_move)
+void Stepper::step(int steps_to_move, void (*callback)())
 {
     int steps_left = abs(steps_to_move); // how many steps to take
 
@@ -102,10 +102,18 @@ void Stepper::step(int steps_to_move)
             // step the motor to step number 0, 1, ..., {3 or 10}
 
             stepMotor(this->step_number % 4);
+            if (callback != nullptr)
+            {
+                callback();
+            }
         }
         else
         {
             yield();
+            if (callback != nullptr)
+            {
+                callback();
+            }
         }
     }
 }

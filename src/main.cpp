@@ -34,79 +34,87 @@ float cumulativeAngle[4] = {0, 0, 0, 0}; // Cumulative angle for each motor
 float prev = 0;
 
 // Move function with delta angle and motor selection
-void move(float DELTAangle, int motorSelector)
+// void move(float DELTAangle, int motorSelector)
+// {
+//   int motorIndex = motorSelector - 1; // Motor selector: 1-4, corresponding to array index 0-3
+//   float currentAngle = 0;
+
+//   // Select the appropriate encoder and read the current angle
+//   switch (motorSelector)
+//   {
+//   case 1:
+//     // currentAngle = motor1Encoder.getAngle();
+//     break;
+//   case 2:
+//     currentAngle = motor1Encoder.getAngle();
+//     myScreen.clear();
+//     myScreen.display.setCursor(0, 0);
+//     myScreen.println(String(currentAngle));
+//     break;
+//   case 3:
+//     //  currentAngle = motor3Encoder.getAngle();
+//     break;
+//   case 4:
+//     // currentAngle = motor4Encoder.getAngle();
+//     break;
+//   default:
+//     Serial.println("Invalid motor selector");
+//     return;
+//   }
+
+//   // Calculate the difference between the current reading and the last cumulative angle
+//   float previousCumulativeAngle = cumulativeAngle[motorIndex];
+//   float angleDifference = currentAngle - fmod(previousCumulativeAngle, 360);
+
+//   // Handle angle wrapping (0-360) range
+//   if (angleDifference > 180)
+//   {
+//     // Encoder wrapped from 360 to 0
+//     angleDifference -= 360;
+//   }
+//   else if (angleDifference < -180)
+//   {
+//     // Encoder wrapped from 0 to 360
+//     angleDifference += 360;
+//   }
+
+//   // Update cumulative angle by adding the corrected angle difference
+//   cumulativeAngle[motorIndex] += angleDifference;
+
+//   // Calculate the target angle after the delta movement
+//   float targetAngle = cumulativeAngle[motorIndex] + DELTAangle;
+
+//   // Calculate PID control variables for the selected motor
+//   float error = targetAngle - cumulativeAngle[motorIndex];
+//   integral[motorIndex] += error;
+//   float derivative = error - prevError[motorIndex];
+//   float motorSpeed = kp * error + ki * integral[motorIndex] + kd * derivative;
+//   prevError[motorIndex] = error;
+
+//   // Apply motor speed and direction using the Motor class
+//   switch (motorSelector)
+//   {
+//   case 1:
+//     motor1.setSpeed(motorSpeed);
+//     break;
+//   case 2:
+//     motor2.setSpeed(motorSpeed);
+//     break;
+//   case 3:
+//     // motor3.setSpeed(motorSpeed);
+//     break;
+//   case 4:
+//     //  motor4.setSpeed(motorSpeed);
+//     break;
+//   }
+// }
+
+void callback()
 {
-  int motorIndex = motorSelector - 1; // Motor selector: 1-4, corresponding to array index 0-3
-  float currentAngle = 0;
-
-  // Select the appropriate encoder and read the current angle
-  switch (motorSelector)
-  {
-  case 1:
-    // currentAngle = motor1Encoder.getAngle();
-    break;
-  case 2:
-    currentAngle = motor1Encoder.getAngle();
-    myScreen.clear();
-    myScreen.display.setCursor(0, 0);
-    myScreen.println(String(currentAngle));
-    break;
-  case 3:
-    //  currentAngle = motor3Encoder.getAngle();
-    break;
-  case 4:
-    // currentAngle = motor4Encoder.getAngle();
-    break;
-  default:
-    Serial.println("Invalid motor selector");
-    return;
-  }
-
-  // Calculate the difference between the current reading and the last cumulative angle
-  float previousCumulativeAngle = cumulativeAngle[motorIndex];
-  float angleDifference = currentAngle - fmod(previousCumulativeAngle, 360);
-
-  // Handle angle wrapping (0-360) range
-  if (angleDifference > 180)
-  {
-    // Encoder wrapped from 360 to 0
-    angleDifference -= 360;
-  }
-  else if (angleDifference < -180)
-  {
-    // Encoder wrapped from 0 to 360
-    angleDifference += 360;
-  }
-
-  // Update cumulative angle by adding the corrected angle difference
-  cumulativeAngle[motorIndex] += angleDifference;
-
-  // Calculate the target angle after the delta movement
-  float targetAngle = cumulativeAngle[motorIndex] + DELTAangle;
-
-  // Calculate PID control variables for the selected motor
-  float error = targetAngle - cumulativeAngle[motorIndex];
-  integral[motorIndex] += error;
-  float derivative = error - prevError[motorIndex];
-  float motorSpeed = kp * error + ki * integral[motorIndex] + kd * derivative;
-  prevError[motorIndex] = error;
-
-  // Apply motor speed and direction using the Motor class
-  switch (motorSelector)
-  {
-  case 1:
-    motor1.setSpeed(motorSpeed);
-    break;
-  case 2:
-    motor2.setSpeed(motorSpeed);
-    break;
-  case 3:
-    // motor3.setSpeed(motorSpeed);
-    break;
-  case 4:
-    //  motor4.setSpeed(motorSpeed);
-    break;
-  }
+  float currentAngle = motor1Encoder.getAngle();
+  myScreen.clear();
+  myScreen.display.setCursor(0, 0);
+  myScreen.println(String(currentAngle));
 }
 
 void setup()
@@ -155,14 +163,9 @@ void loop()
   // Example move commands:
   // move(45.0, 1);  // Move motor 1 by 45 degrees
 
-  float currentAngle = motor1Encoder.getAngle();
-  myScreen.clear();
-  myScreen.display.setCursor(0, 0);
-  myScreen.println(String(currentAngle));
-
   // motor2.brake();
   // prev = currentAngle;
-  // myStepper.step(100);
+  myStepper.step(100, );
   // myStepper.stepMotor(0);
   // myStepper.stepMotor(1);
   // myStepper.stepMotor(2);
