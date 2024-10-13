@@ -9,10 +9,10 @@ BNO myBNO;
 Screen myScreen(128, 32);
 
 // Define encoder objects for 4 motors
-// Encoder motor1Encoder(A0);
-Encoder motor2Encoder(A0);
-// Encoder motor3Encoder(A2);
-// Encoder motor4Encoder(A3);
+Encoder motor1Encoder(A0);
+// Encoder motor2Encoder(A0);
+//  Encoder motor3Encoder(A2);
+//  Encoder motor4Encoder(A3);
 
 // Define Motor objects for 4 motors
 Motor motor1(0, 2, 1); // Motor 1: PWM, IN1, IN2 pins
@@ -46,7 +46,7 @@ void move(float DELTAangle, int motorSelector)
     // currentAngle = motor1Encoder.getAngle();
     break;
   case 2:
-    currentAngle = motor2Encoder.getAngle();
+    currentAngle = motor1Encoder.getAngle();
     myScreen.clear();
     myScreen.display.setCursor(0, 0);
     myScreen.println(String(currentAngle));
@@ -133,7 +133,9 @@ void setup()
   //   while (1)
   //     ; // Initialization failed, halt here
   // }
+
   myStepper.setSpeed(10);
+
   // myStepper.stepMotor(0);
   // myStepper.stepMotor(1);
   // myStepper.stepMotor(2);
@@ -152,11 +154,10 @@ void loop()
   // Example move commands:
   // move(45.0, 1);  // Move motor 1 by 45 degrees
 
-  // delay(2000); // Delay for stability between moves
-  // float currentAngle = motor2Encoder.getAngle();
-  // myScreen.clear();
-  // myScreen.display.setCursor(0, 0);
-  // myScreen.println(String(currentAngle));
+  float currentAngle = motor1Encoder.getAngle();
+  myScreen.clear();
+  myScreen.display.setCursor(0, 0);
+  myScreen.println(String(currentAngle));
 
   // motor2.brake();
   // prev = currentAngle;
