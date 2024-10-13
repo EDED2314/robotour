@@ -10,7 +10,7 @@ Screen myScreen(128, 32);
 
 // Define encoder objects for 4 motors
 Encoder motor1Encoder(A0);
-// Encoder motor2Encoder(A0);
+Encoder motor2Encoder(A1);
 //  Encoder motor3Encoder(A2);
 //  Encoder motor4Encoder(A3);
 
@@ -22,7 +22,8 @@ Motor motor2(7, 5, 6); // Motor 2: PWM, IN1, IN2 pins
 // Motor motor3(10, 12, 11); // Motor 3: PWM, IN1, IN2 pins
 // Motor motor4(14, 16, 15); // Motor 4: PWM, IN1, IN2 pins
 const int stepsPerRev = 200;
-Stepper myStepper(stepsPerRev, 8, 9, 10, 11);
+// Stepper myStepper(stepsPerRev, 8, 9, 10, 11);
+Stepper myStepper(stepsPerRev, 3, 4, 5, 6);
 // Stepper myStepper(stepsPerRev, 11, 10, 9, 8);
 //  PID control variables
 float kp = 1.0, ki = 0.1, kd = 0.01;
@@ -111,7 +112,7 @@ float prev = 0;
 
 void callback()
 {
-  float currentAngle = motor1Encoder.getAngle();
+  float currentAngle = motor2Encoder.getAngle();
   myScreen.clear();
   myScreen.display.setCursor(0, 0);
   myScreen.println(String(currentAngle));
