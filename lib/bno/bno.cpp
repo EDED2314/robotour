@@ -110,9 +110,15 @@ float BNO::getHeading()
 
     imu::Quaternion q = bno.getQuat();
     imu::Quaternion q_prime = q.conjugate();
-    imu::Quaternion p{0, 0, 1, 0};
+    imu::Quaternion p{1, 1, 1, 0};
     imu::Quaternion p_prime = q * p * q_prime;
-    heading = acos(p_prime.z()) * 180 / PI;
+    // heading = acos(p_prime.z()) * 180 / PI;
+
+    heading = atan2(p_prime.y(), p_prime.x()) * (180.0 / M_PI); // Convert to degrees
+    if (heading < 0)
+    {
+        heading += 360; // Normalize to 0-360 degrees
+    }
 
     if (isnan(heading))
     {
@@ -120,18 +126,6 @@ float BNO::getHeading()
     }
 
     return heading;
-}
-
-float BNO::getHeadingGyro()
-{
-    long tnow = millis();
-    long dt = tnow - lastTimeSampled;
-    float wx, wy, wz;
-    getAngularVelocity(wx, wy, wz);
-    float E1 = w1kalman.updateEstimate(wx);
-    heading += E1 * dt * 0.001 * 0.99;
-    lastTimeSampled = tnow;
-    return heading * (180.0 / M_PI);
 }
 
 // Get the angular velocity (wx, wy, wz)

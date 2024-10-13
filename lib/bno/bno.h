@@ -20,7 +20,6 @@ public:
 
     // Calculate the heading of the robot
     float getHeading();
-    float getHeadingGyro();
 
     // Get the angular velocity (wx, wy, wz)
     void getAngularVelocity(float &wx, float &wy, float &wz);
