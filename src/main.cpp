@@ -11,16 +11,7 @@ Screen myScreen(128, 32);
 // Define encoder objects for 4 motors
 Encoder motor1Encoder(A0);
 Encoder motor2Encoder(A1);
-//  Encoder motor3Encoder(A2);
-//  Encoder motor4Encoder(A3);
 
-// Define Motor objects for 4 motors
-Motor motor1(0, 2, 1); // Motor 1: PWM, IN1, IN2 pins
-Motor motor2(7, 5, 6); // Motor 2: PWM, IN1, IN2 pins
-
-// CHECK THIS PLEASE THESE ARE DEFAULT VALUES LMAOOO
-// Motor motor3(10, 12, 11); // Motor 3: PWM, IN1, IN2 pins
-// Motor motor4(14, 16, 15); // Motor 4: PWM, IN1, IN2 pins
 const int stepsPerRev = 200;
 // Stepper myStepper(stepsPerRev, 8, 9, 10, 11);
 Stepper myStepper(stepsPerRev, 3, 4, 5, 6);
@@ -123,33 +114,19 @@ void setup()
   Serial.begin(9600);
   analogReadResolution(12); // Set ADC resolution to 12 bits (0-4095)
 
-  // Initialize encoders
-  // motor1Encoder.begin();
-  // motor2Encoder.begin();
-  // motor3Encoder.begin();
-  // motor4Encoder.begin();
-
-  // Initialize motor objects
-  motor1.init();
-  // motor2.init();
-  // motor3.init();
-  // motor4.init();
+  motor1Encoder.begin();
+  motor2Encoder.begin();
 
   myScreen.init();
   myScreen.print("hello");
 
-  // if (!myBNO.init(false))
-  // {
-  //   while (1)
-  //     ; // Initialization failed, halt here
-  // }
+  if (!myBNO.init(false))
+  {
+    while (1)
+      ; // Initialization failed, halt here
+  }
 
   myStepper.setSpeed(30);
-
-  // myStepper.stepMotor(0);
-  // myStepper.stepMotor(1);
-  // myStepper.stepMotor(2);
-  // myStepper.stepMotor(3);
 }
 
 void loop()
@@ -166,10 +143,10 @@ void loop()
 
   // motor2.brake();
   // prev = currentAngle;
-  myStepper.step(100, &callback);
-  // myStepper.stepMotor(0);
-  // myStepper.stepMotor(1);
-  // myStepper.stepMotor(2);
-  // myStepper.stepMotor(3);
-  delay(1000);
+  // myStepper.step(100, &callback);
+  // // myStepper.stepMotor(0);
+  // // myStepper.stepMotor(1);
+  // // myStepper.stepMotor(2);
+  // // myStepper.stepMotor(3);
+  // delay(1000);
 }
