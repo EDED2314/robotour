@@ -165,7 +165,7 @@ void loop()
 
   // motor2.brake();
   // prev = currentAngle;
-  myStepper.step(100, );
+  myStepper.step(100, &callback);
   // myStepper.stepMotor(0);
   // myStepper.stepMotor(1);
   // myStepper.stepMotor(2);
