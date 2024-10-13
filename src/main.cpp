@@ -12,8 +12,8 @@ Encoder motor1Encoder(A0);
 Encoder motor2Encoder(A1);
 
 const int stepsPerRev = 200;
-Stepper leftStepper(stepsPerRev, 8, 9, 10, 11);
-Stepper rightStepper(stepsPerRev, 3, 4, 5, 6);
+Stepper leftStepper(stepsPerRev, 8, 9, 10, 11, 10);
+Stepper rightStepper(stepsPerRev, 3, 4, 5, 6, 10);
 
 void callback()
 {

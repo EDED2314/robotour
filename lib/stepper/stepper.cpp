@@ -21,7 +21,7 @@
  *   Sets which wires should control the motor.
  */
 Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
-                 int motor_pin_3, int motor_pin_4)
+                 int motor_pin_3, int motor_pin_4, int wheelRadiusCM)
 {
     this->step_number = 0;                   // which step the motor is on
     this->direction = 0;                     // motor direction
@@ -42,6 +42,8 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
 
     // pin_count is used by the stepMotor() method:
     this->pin_count = 4;
+
+    this->radius = wheelRadiusCM / 100.0;
 }
 
 /*
@@ -50,6 +52,12 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
 void Stepper::setSpeed(long whatSpeed)
 {
     this->step_delay = 60L * 1000L * 1000L / this->number_of_steps / whatSpeed;
+}
+
+void Stepper::moveDis(int cm)
+{
+    float m = cm / 100.0;
+    // TODO
 }
 
 /*

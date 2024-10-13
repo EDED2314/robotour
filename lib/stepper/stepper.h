@@ -8,13 +8,16 @@ class Stepper
 {
 public:
     Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
-            int motor_pin_3, int motor_pin_4);
+            int motor_pin_3, int motor_pin_4, int wheelRadiusCM);
     // speed setter method:
     void setSpeed(long whatSpeed);
 
     // mover method:
     void step(int number_of_steps, void (*callback)());
     void stepMotor(int this_step);
+
+    // moving
+    void moveDis(int cm);
 
 private:
     int direction;            // Direction of rotation
@@ -28,6 +31,8 @@ private:
     int motor_pin_2;
     int motor_pin_3;
     int motor_pin_4;
+
+    float radius;
 
     unsigned long last_step_time; // timestamp in us of when the last step was taken
 };
