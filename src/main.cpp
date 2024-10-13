@@ -47,22 +47,4 @@ void setup()
 
 void loop()
 {
-
-  // motor1.setSpeed(100);
-  // motor2.setSpeed(200);
-  // delay(2000);
-  // motor1.brake();
-  // motor2.brake();
-  // delay(2000);
-  // Example move commands:
-  // move(45.0, 1);  // Move motor 1 by 45 degrees
-
-  // motor2.brake();
-  // prev = currentAngle;
-  // myStepper.step(100, &callback);
-  // // myStepper.stepMotor(0);
-  // // myStepper.stepMotor(1);
-  // // myStepper.stepMotor(2);
-  // // myStepper.stepMotor(3);
-  // delay(1000);
 }
