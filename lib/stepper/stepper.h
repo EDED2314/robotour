@@ -14,6 +14,7 @@ public:
 
     // mover method:
     void step(int number_of_steps, void (*callback)());
+    void stepTwo(int number_of_steps, Stepper, void (*callback)());
     void stepMotor(int this_step);
 
     // moving

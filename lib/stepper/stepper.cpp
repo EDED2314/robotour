@@ -60,6 +60,65 @@ void Stepper::moveDis(int cm)
     // TODO
 }
 
+void Stepper::stepTwo(int steps_to_move, Stepper other, void (*callback)())
+{
+    int steps_left = abs(steps_to_move); // how many steps to take
+
+    if (steps_to_move > 0)
+    {
+        this->direction = 1;
+    }
+    if (steps_to_move < 0)
+    {
+        this->direction = 0;
+    }
+    while (steps_left > 0)
+    {
+        unsigned long now = micros();
+
+        if (now - this->last_step_time >= this->step_delay)
+        {
+
+            this->last_step_time = now;
+
+            if (this->direction == 1)
+            {
+                this->step_number++;
+                if (this->step_number == this->number_of_steps)
+                {
+                    this->step_number = 0;
+                }
+            }
+            else
+            {
+                if (this->step_number == 0)
+                {
+                    this->step_number = this->number_of_steps;
+                }
+                this->step_number--;
+            }
+            // decrement the steps left:
+            steps_left--;
+            // step the motor to step number 0, 1, ..., {3 or 10}
+
+            stepMotor(this->step_number % 4);
+            other.stepMotor(this->step_number % 4);
+            if (callback != nullptr)
+            {
+                callback();
+            }
+        }
+        else
+        {
+            yield();
+            if (callback != nullptr)
+            {
+                callback();
+            }
+        }
+    }
+}
+
 /*
  * Moves the motor steps_to_move steps.  If the number is negative,
  * the motor moves in the reverse direction.
